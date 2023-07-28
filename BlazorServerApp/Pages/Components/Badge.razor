@@ -1,0 +1,24 @@
+﻿<span class="badge text-bg-@BootstrapType">@BadgeText</span>
+
+@code{
+    string BootstrapType;
+    string BadgeText;
+
+    [Parameter]
+    public int Status { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        switch (Status)
+        {
+            case (int)Constants.Status.InActive: 
+                BootstrapType = Constants.BOOTSTRAP_SECONDARY;
+                BadgeText = "Inactive";
+                break;
+            case (int)Constants.Status.Active:
+                BootstrapType = Constants.BOOTSTRAP_SUCCESS;
+                BadgeText = "Active";
+                break;
+        }
+    }
+}

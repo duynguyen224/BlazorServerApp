@@ -1,0 +1,84 @@
+﻿@page "/departments"
+@page "/departments/{isSuccess:bool}"
+@inject IDepartmentService departmentService;
+@inject NavigationManager navigationManager;
+@inject IJSRuntime jsRuntime;
+
+<PageTitle>Departments</PageTitle>
+
+<h1>List departments</h1>
+
+<div class="row">
+    <div class="col-6">
+        <Alert />
+
+        <div class="text-end">
+            <button @onclick="HandleClickCreate" type="button" class="btn btn-primary"><i class="fa-solid fa-plus fa-lg"></i></button>
+        </div>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th width="10%">#</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th width="15%">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (departments != null && departments.Count > 0)
+                {
+                    int index = 1;
+                    @foreach (var d in departments)
+                    {
+                        <tr data-id="@d.Id" role="button" @ondblclick="@(() => HandleEditClick(d.Id))">
+                            <th>@(index++)</th>
+                            <td>@d.Name</td>
+                            <td><Badge Status="d.Status"/></td>
+                            <td>
+                                <i class="fa-solid fa-pen-to-square text-warning" role="button" @onclick="@(() => HandleEditClick(d.Id))"></i>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <p class="text-danger">Empty!</p>
+                }
+            </tbody>
+        </table>
+        <Pagination />
+    </div>
+</div>
+
+@code {
+    List<Department>? departments = new();
+    bool showAlert = false;
+
+    [Parameter]
+    public bool isSuccess { get; set; }
+
+    protected override void OnInitialized()
+    {
+        departments = departmentService.GetAll().ToList();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (isSuccess)
+        {
+            await jsRuntime.InvokeVoidAsync("showAlert", true, Constants.BOOTSTRAP_SUCCESS, "Created!");
+            navigationManager.NavigateTo("/departments");
+        }
+    }
+
+    private void HandleClickCreate()
+    {
+        navigationManager.NavigateTo("/departments/create");
+    }
+
+    private void HandleEditClick(Guid id)
+    {
+        navigationManager.NavigateTo($"/departments/edit/{id}");
+    }
+}
