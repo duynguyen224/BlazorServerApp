@@ -7,8 +7,8 @@ namespace BlazorServerApp.Data.DTO.Request
     {
         public Guid Id { get; set; }
         [Required]
-        [NotDuplicateName]
+        //[NotDuplicateName]
         public string Name { get; set; }
-        public bool Status { get; set; } = true;
+        public bool Status { get; set; }
     }
 }

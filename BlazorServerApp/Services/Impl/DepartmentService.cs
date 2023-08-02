@@ -2,6 +2,7 @@
 using BlazorServerApp.Context;
 using BlazorServerApp.Data.DTO.Request;
 using BlazorServerApp.Data.Entities;
+using BlazorServerApp.Data.Objects;
 using System.Runtime.ConstrainedExecution;
 
 namespace BlazorServerApp.Services.Impl
@@ -14,10 +15,11 @@ namespace BlazorServerApp.Services.Impl
         {
             _dbContext = appDBContext;
         }
-        public IEnumerable<Department> GetAll()
+        public async Task<PaginationInfo<Department>> GetPaginatedListAsync(PaginationInfo<Department> paginationInfo)
         {
-            return from s in _dbContext.Departments
-                   select s;
+            var departments = _dbContext.Departments;
+
+            return await PaginationInfo<Department>.CreatePaginatedListAsync(departments, paginationInfo);
         }
 
         public async Task<Department> FindById(Guid id)

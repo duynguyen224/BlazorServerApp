@@ -6,7 +6,7 @@ namespace BlazorServerApp.Data.DTO.Request
     public class DepartmentCreateRequest
     {
         [Required]
-        [NotDuplicateName]
+        //[NotDuplicateName]
         public string Name { get; set; }
         public bool Status { get; set; } = true;
     }

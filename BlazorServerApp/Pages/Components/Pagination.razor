@@ -1,26 +1,63 @@
-﻿@*@typeparam T*@
+﻿@typeparam T
 
 <nav aria-label="Page navigation example">
-    <ul class="pagination">
-        <li class="page-item">
-            <a class="page-link" href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="sr-only">Previous</span>
-            </a>
+    <ul class="pagination text-end">
+        <li class="page-item @(PaginationInfo.IsFirstPage ? "disabled" : "") @(PaginationInfo.CurrentPage == 1 ? "active" : "")" @onclick="@(() => HandleClickPage(1))">
+            <a class="page-link" role="button"><span aria-hidden="true">First</span></a>
         </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-            <a class="page-link" href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="sr-only">Next</span>
-            </a>
+        <li class="page-item @(PaginationInfo.HasPreviousPage ? "" : "disabled")" @onclick="@(() => HandleClickNext(false))">
+            <a class="page-link" role="button">&laquo;</a>
+        </li>
+
+        @for (int i = PaginationInfo.StartPage; i <= PaginationInfo.EndPage; i++)
+        {
+            var pageNumber = i;
+            var isCurrentPage = PaginationInfo.CurrentPage == i ? true : false;
+
+            <li class="page-item @(isCurrentPage ? "active" : "")" @onclick="@(!isCurrentPage ? () => HandleClickPage(pageNumber): null)">
+                <a class="page-link" role="button">@(pageNumber)</a>
+            </li>
+        }
+
+        <li class="page-item @(PaginationInfo.HasNextPage ? "" : "disabled")" @onclick="@(() => HandleClickNext())">
+            <a class="page-link" role="button">&raquo;</a>
+        </li>
+        <li class="page-item @(PaginationInfo.IsLastPage ? "disabled" : "") @(PaginationInfo.CurrentPage == PaginationInfo.TotalPages ? "active" : "")" @onclick="@(() => HandleClickPage(PaginationInfo.TotalPages))">
+            <a class="page-link" role="button"><span aria-hidden="true">Last</span></a>
         </li>
     </ul>
 </nav>
 
 @code {
-    //[Parameter]
-    //public PaginationData<T> Data { get; set; }
+    [Parameter]
+    public PaginationInfo<T> PaginationInfo { get; set; }
+
+    [Parameter]
+    public int PagePerPagingBlock { get; set; } = 5;
+
+    [Parameter]
+    public EventCallback Callback { get; set; }
+
+    public async Task HandleClickPage(int pageNum)
+    {        
+        PaginationInfo.CurrentPage = pageNum;
+        await Callback.InvokeAsync();
+    }
+
+    public async Task HandleClickNext(bool isNext = true)
+    {
+        int currentPage;
+
+        if (isNext)
+        {
+            currentPage = (PaginationInfo.CurrentBlock + 1) * PagePerPagingBlock - PagePerPagingBlock + 1;
+        }
+        else
+        {
+            currentPage = (PaginationInfo.CurrentBlock - 1) * PagePerPagingBlock - PagePerPagingBlock + 1;
+        }
+
+        PaginationInfo.CurrentPage = currentPage;
+        await Callback.InvokeAsync();
+    }
 }
