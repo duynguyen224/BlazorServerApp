@@ -1,9 +1,53 @@
-﻿@page "/create-employee"
+﻿@page "/employees/create"
+@inject IEmployeeService employeeService;
+@inject NavigationManager navigationManager;
 
 <PageTitle>Create employee</PageTitle>
 
 <h1>Create employee</h1>
 
-@code {
+<div class="row">
+    <div class="col-4">
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="@employee" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3 form-group">
+                        <label for="name">Name</label>
+                        <InputText @bind-Value="employee.Name" class="form-control" id="name" placeholder="Enter department name" />
+                        <ValidationMessage For="() => employee.Name" />
+                    </div><div class="mb-3 form-group">
+                        <label for="name">Name</label>
+                        <InputText @bind-Value="employee.Name" class="form-control" id="name" placeholder="Enter department name" />
+                        <ValidationMessage For="() => employee.Name" />
+                    </div><div class="mb-3 form-group">
+                        <label for="name">Name</label>
+                        <InputText @bind-Value="employee.Name" class="form-control" id="name" placeholder="Enter department name" />
+                        <ValidationMessage For="() => employee.Name" />
+                    </div>
+                    <div class="mb-3 form-check">
+                        <InputCheckbox @bind-Value="employee.Status" class="form-check-input" id="status" checked />
+                        <label class="form-check-label" for="status">Status</label>
+                    </div>
+                    <a class="btn btn-secondary" @onclick="@HandleClickBack">Back</a>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
 
+@code {
+    private EmployeeCreateRequest employee = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await employeeService.Create(employee);
+        navigationManager.NavigateTo("/employees/true");
+    }
+
+    private void HandleClickBack()
+    {
+        navigationManager.NavigateTo("/employees");
+    }
 }

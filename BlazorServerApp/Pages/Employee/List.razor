@@ -1,9 +1,86 @@
 ﻿@page "/employees"
+@page "/employees/{isSuccess:bool}"
+@inject IEmployeeService employeeService;
+@inject NavigationManager navigationManager;
+@inject IJSRuntime jsRuntime;
 
 <PageTitle>Employees</PageTitle>
 
 <h1>List employees</h1>
 
-@code {
+<div class="row">
+    <div class="col-4">
+        <Alert />
 
+        <div class="text-end">
+            <button @onclick="HandleClickCreate" type="button" class="btn btn-primary"><i class="fa-solid fa-plus fa-lg"></i></button>
+        </div>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th width="10%">#</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (PaginationInfo != null && PaginationInfo.Data != null && PaginationInfo.Data.Count > 0)
+                {
+                    int index = 1;
+                    @foreach (var d in PaginationInfo.Data)
+                    {
+                        <tr data-id="@d.Id" role="button" @ondblclick="@(() => HandleEditClick(d.Id))">
+                            <th>@(index++)</th>
+                            <td>@d.Name</td>
+                            <td><Badge Status="d.Status" /></td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <p class="text-danger">Empty!</p>
+                }
+            </tbody>
+        </table>
+        <Pagination PaginationInfo="PaginationInfo" GetPaginationInfoAsync="@GetPaginationInfoAsync" />
+    </div>
+</div>
+
+@code {
+    PaginationInfo<Employee> PaginationInfo = new();
+    bool showAlert = false;
+
+    [Parameter]
+    public bool isSuccess { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetPaginationInfoAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (isSuccess)
+        {
+            await jsRuntime.InvokeVoidAsync("showAlert", true, Constants.BOOTSTRAP_SUCCESS, "Created!");
+            navigationManager.NavigateTo("/employees");
+        }
+    }
+
+    private void HandleClickCreate()
+    {
+        navigationManager.NavigateTo("/employees/create");
+    }
+
+    private void HandleEditClick(Guid id)
+    {
+        navigationManager.NavigateTo($"/employees/edit/{id}");
+    }
+
+    private async Task GetPaginationInfoAsync()
+    {
+        PaginationInfo = await employeeService.GetPaginatedListAsync(PaginationInfo);
+        StateHasChanged();
+    }
 }

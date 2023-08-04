@@ -1,4 +1,5 @@
-﻿using BlazorServerApp.Data.Entities;
+﻿using BlazorServerApp.Common;
+using BlazorServerApp.Data.Entities;
 using BlazorServerApp.Data.Objects;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ namespace BlazorServerApp.Context
 
         public DbSet<Department> Departments { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Document> Documents { get; set; }
 
         public override int SaveChanges()
         {

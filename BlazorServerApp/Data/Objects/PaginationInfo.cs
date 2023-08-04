@@ -30,7 +30,7 @@ namespace BlazorServerApp.Data.Objects
         {
             get
             {
-                return (CurrentBlock == (int)Math.Round(((double) TotalCount / ItemPerPage) / PagePerBlock));
+                return (CurrentBlock == (int)Math.Ceiling(((double) TotalCount / ItemPerPage) / PagePerBlock));
             }
         }
 

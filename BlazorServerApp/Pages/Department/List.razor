@@ -43,7 +43,7 @@
                 }
             </tbody>
         </table>
-        <Pagination PaginationInfo="PaginationInfo" GetListDataAsync="@GetListDataAsync" />
+        <Pagination PaginationInfo="PaginationInfo" GetPaginationInfoAsync="@GetPaginationInfoAsync" />
     </div>
 </div>
 
@@ -56,7 +56,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await GetListDataAsync();
+        await GetPaginationInfoAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -78,7 +78,7 @@
         navigationManager.NavigateTo($"/departments/edit/{id}");
     }
 
-    private async Task GetListDataAsync()
+    private async Task GetPaginationInfoAsync()
     {
         PaginationInfo = await departmentService.GetPaginatedListAsync(PaginationInfo);
         StateHasChanged();

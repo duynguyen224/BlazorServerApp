@@ -8,5 +8,6 @@ namespace BlazorServerApp.Data.Objects
         public Guid UpdatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        public int Status { get; set; }
     }
 }

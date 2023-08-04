@@ -1,32 +1,35 @@
 ﻿@typeparam T
 
-<nav aria-label="Page navigation example">
-    <ul class="pagination text-end">
-        <li class="page-item @(PaginationInfo.IsFirstBlock ? "disabled" : "") @(PaginationInfo.CurrentPage == 1 ? "active" : "")" @onclick="@(!PaginationInfo.IsFirstBlock ? () => HandleClickPage(1) : null)">
-            <a class="page-link" role="button"><span aria-hidden="true">First</span></a>
-        </li>
-        <li class="page-item @(!PaginationInfo.IsFirstBlock ? "" : "disabled")" @onclick="@(!PaginationInfo.IsFirstBlock ? () => HandleClickNext(false) : null)">
-            <a class="page-link" role="button">&laquo;</a>
-        </li>
-
-        @for (int i = PaginationInfo.StartPage; i <= PaginationInfo.EndPage; i++)
-        {
-            var pageNumber = i;
-            var isCurrentPage = PaginationInfo.CurrentPage == i ? true : false;
-
-            <li class="page-item @(isCurrentPage ? "active" : "")" @onclick="@(!isCurrentPage ? () => HandleClickPage(pageNumber): null)">
-                <a class="page-link" role="button">@(pageNumber)</a>
+@if (!IsEmptyList())
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination text-end">
+            <li class="page-item @(IsFirstBlock() ? "disabled" : "") @(PaginationInfo.CurrentPage == 1 ? "active" : "")" @onclick="@(!IsFirstBlock() ? () => HandleClickPage(1) : null)">
+                <a class="page-link" role="button"><span aria-hidden="true">First</span></a>
             </li>
-        }
+            <li class="page-item @(!IsFirstBlock() ? "" : "disabled")" @onclick="@(!IsFirstBlock() ? () => HandleClickNext(false) : null)">
+                <a class="page-link" role="button">&laquo;</a>
+            </li>
 
-        <li class="page-item @(!PaginationInfo.IsLastBlock ? "" : "disabled")" @onclick="@(!PaginationInfo.IsLastBlock ? () => HandleClickNext() : null)">
-            <a class="page-link" role="button">&raquo;</a>
-        </li>
-        <li class="page-item @(PaginationInfo.IsLastBlock ? "disabled" : "") @(PaginationInfo.CurrentPage == PaginationInfo.TotalPages ? "active" : "")" @onclick="@(!PaginationInfo.IsLastBlock ? () => HandleClickPage(PaginationInfo.TotalPages) : null)">
-            <a class="page-link" role="button"><span aria-hidden="true">Last</span></a>
-        </li>
-    </ul>
-</nav>
+            @for (int i = PaginationInfo.StartPage; i <= PaginationInfo.EndPage; i++)
+            {
+                var pageNumber = i;
+                var isCurrentPage = PaginationInfo.CurrentPage == i ? true : false;
+
+                <li class="page-item @(isCurrentPage ? "active" : "")" @onclick="@(!isCurrentPage ? () => HandleClickPage(pageNumber): null)">
+                    <a class="page-link" role="button">@(pageNumber)</a>
+                </li>
+            }
+
+            <li class="page-item @(!IsLastBlock() ? "" : "disabled")" @onclick="@(!IsLastBlock() ? () => HandleClickNext() : null)">
+                <a class="page-link" role="button">&raquo;</a>
+            </li>
+            <li class="page-item @(IsLastBlock() ? "disabled" : "") @(PaginationInfo.CurrentPage == PaginationInfo.TotalPages && PaginationInfo.CurrentPage != 1? "active" : "")" @onclick="@(!IsLastBlock() ? () => HandleClickPage(PaginationInfo.TotalPages) : null)">
+                <a class="page-link" role="button"><span aria-hidden="true">Last</span></a>
+            </li>
+        </ul>
+    </nav>
+}
 
 @code {
     [Parameter]
@@ -36,12 +39,12 @@
     public int PagePerPagingBlock { get; set; } = 5;
 
     [Parameter]
-    public EventCallback GetListDataAsync { get; set; }
+    public EventCallback GetPaginationInfoAsync { get; set; }
 
     public async Task HandleClickPage(int pageNum)
     {        
         PaginationInfo.CurrentPage = pageNum;
-        await GetListDataAsync.InvokeAsync();
+        await GetPaginationInfoAsync.InvokeAsync();
     }
 
     public async Task HandleClickNext(bool isNext = true)
@@ -58,6 +61,25 @@
         }
 
         PaginationInfo.CurrentPage = currentPage;
-        await GetListDataAsync.InvokeAsync();
+        await GetPaginationInfoAsync.InvokeAsync();
+    }
+
+    public bool IsFirstBlock()
+    {
+        return PaginationInfo.IsFirstBlock;
+    }
+
+    public bool IsLastBlock()
+    {
+        return PaginationInfo.IsLastBlock;
+    }
+
+    public bool IsEmptyList()
+    {
+        if (PaginationInfo != null && PaginationInfo.Data != null && PaginationInfo.Data.Any())
+        {
+            return false;
+        }
+        return true;
     }
 }
