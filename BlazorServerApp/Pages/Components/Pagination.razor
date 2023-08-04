@@ -2,10 +2,10 @@
 
 <nav aria-label="Page navigation example">
     <ul class="pagination text-end">
-        <li class="page-item @(PaginationInfo.IsFirstPage ? "disabled" : "") @(PaginationInfo.CurrentPage == 1 ? "active" : "")" @onclick="@(() => HandleClickPage(1))">
+        <li class="page-item @(PaginationInfo.IsFirstBlock ? "disabled" : "") @(PaginationInfo.CurrentPage == 1 ? "active" : "")" @onclick="@(!PaginationInfo.IsFirstBlock ? () => HandleClickPage(1) : null)">
             <a class="page-link" role="button"><span aria-hidden="true">First</span></a>
         </li>
-        <li class="page-item @(PaginationInfo.HasPreviousPage ? "" : "disabled")" @onclick="@(() => HandleClickNext(false))">
+        <li class="page-item @(!PaginationInfo.IsFirstBlock ? "" : "disabled")" @onclick="@(!PaginationInfo.IsFirstBlock ? () => HandleClickNext(false) : null)">
             <a class="page-link" role="button">&laquo;</a>
         </li>
 
@@ -19,10 +19,10 @@
             </li>
         }
 
-        <li class="page-item @(PaginationInfo.HasNextPage ? "" : "disabled")" @onclick="@(() => HandleClickNext())">
+        <li class="page-item @(!PaginationInfo.IsLastBlock ? "" : "disabled")" @onclick="@(!PaginationInfo.IsLastBlock ? () => HandleClickNext() : null)">
             <a class="page-link" role="button">&raquo;</a>
         </li>
-        <li class="page-item @(PaginationInfo.IsLastPage ? "disabled" : "") @(PaginationInfo.CurrentPage == PaginationInfo.TotalPages ? "active" : "")" @onclick="@(() => HandleClickPage(PaginationInfo.TotalPages))">
+        <li class="page-item @(PaginationInfo.IsLastBlock ? "disabled" : "") @(PaginationInfo.CurrentPage == PaginationInfo.TotalPages ? "active" : "")" @onclick="@(!PaginationInfo.IsLastBlock ? () => HandleClickPage(PaginationInfo.TotalPages) : null)">
             <a class="page-link" role="button"><span aria-hidden="true">Last</span></a>
         </li>
     </ul>
@@ -36,12 +36,12 @@
     public int PagePerPagingBlock { get; set; } = 5;
 
     [Parameter]
-    public EventCallback Callback { get; set; }
+    public EventCallback GetListDataAsync { get; set; }
 
     public async Task HandleClickPage(int pageNum)
     {        
         PaginationInfo.CurrentPage = pageNum;
-        await Callback.InvokeAsync();
+        await GetListDataAsync.InvokeAsync();
     }
 
     public async Task HandleClickNext(bool isNext = true)
@@ -58,6 +58,6 @@
         }
 
         PaginationInfo.CurrentPage = currentPage;
-        await Callback.InvokeAsync();
+        await GetListDataAsync.InvokeAsync();
     }
 }

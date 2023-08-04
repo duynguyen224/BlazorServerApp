@@ -1,5 +1,6 @@
 ﻿using BlazorServerApp.Common;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace BlazorServerApp.Data.Objects
 {
@@ -11,40 +12,25 @@ namespace BlazorServerApp.Data.Objects
         public int TotalPages { get; set; }
         public int TotalCount { get; set; }
         public int CurrentBlock { get; set; }
+        public int PagePerBlock { get; set; } = 5;
         public int StartPage { get; set; } = 1;
         public int EndPage { get; set; }
         public string SortDirection { get; set; } = "ASC";
         public string SortField { get; set; } = "CreatedDate";
 
-        public bool IsFirstPage
+        public bool IsFirstBlock
         {
             get
             {
-                return (CurrentPage == 1);
+                return (CurrentBlock == 1);
             }
         }
 
-        public bool IsLastPage
+        public bool IsLastBlock
         {
             get
             {
-                return (CurrentPage == TotalPages);
-            }
-        }
-
-        public bool HasPreviousPage
-        {
-            get
-            {
-                return (CurrentPage > 1);
-            }
-        }
-
-        public bool HasNextPage
-        {
-            get
-            {
-                return (CurrentPage < TotalPages);
+                return (CurrentBlock == (int)Math.Round(((double) TotalCount / ItemPerPage) / PagePerBlock));
             }
         }
 
@@ -54,14 +40,15 @@ namespace BlazorServerApp.Data.Objects
             var itemPerPage = pagingInfo.ItemPerPage;
             var sortDirection = pagingInfo.SortDirection;
             var sortField = pagingInfo.SortField;
+            var pagePerBlock = pagingInfo.PagePerBlock;
 
             var totalCount = await dataSource.CountAsync();
             var listItem = await dataSource.Skip((currentPage - 1) * itemPerPage).Take(itemPerPage).ToListAsync();
             var totalPages = (totalCount / itemPerPage) % 1 == 0 ? (int)(totalCount / itemPerPage) : (int)(totalCount / itemPerPage) + 1;
 
-            var block = (int) Math.Ceiling((double)currentPage / 5);
-            var startPage = block * 5 - 5 + 1;
-            var endPage = Math.Min(block*5, totalPages);
+            var block = (int)Math.Ceiling((double)currentPage / pagePerBlock);
+            var startPage = block * pagePerBlock - pagePerBlock + 1;
+            var endPage = Math.Min(block * 5, totalPages);
 
             return new PaginationInfo<T>()
             {
@@ -72,6 +59,7 @@ namespace BlazorServerApp.Data.Objects
                 TotalCount = totalCount,
                 SortDirection = sortDirection,
                 CurrentBlock = block,
+                PagePerBlock = pagePerBlock,
                 SortField = sortField,
                 StartPage = startPage,
                 EndPage = endPage
