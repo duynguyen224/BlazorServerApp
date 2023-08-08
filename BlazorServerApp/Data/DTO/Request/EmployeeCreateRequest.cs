@@ -7,8 +7,7 @@ namespace BlazorServerApp.Data.DTO.Request
         [Required]
         //[NotDuplicateName]
         public string Name { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public 
+        public DateTime DateOfBirth { get; set; } 
         public bool Status { get; set; } = true;
     }
 }

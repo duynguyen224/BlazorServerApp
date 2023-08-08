@@ -29,10 +29,15 @@ namespace BlazorServerApp.Services.Impl
 
         public async Task Create(DepartmentCreateRequest department)
         {
-            var d = new Department();
-            d.Name = department.Name;
-            d.Status = department.Status == true ? (int)Constants.Status.Active : (int)Constants.Status.InActive;
-            await _dbContext.AddAsync(d);
+            List<Department> list = new List<Department>();
+            for(int i= 1; i<=143; i++)
+            {
+                var d = new Department();
+                d.Name = department.Name + i;
+                d.Status = department.Status == true ? (int)Constants.Status.Active : (int)Constants.Status.InActive;
+                list.Add(d);
+            }
+            await _dbContext.AddRangeAsync(list);
             await _dbContext.SaveChangesAsync();
         }
 

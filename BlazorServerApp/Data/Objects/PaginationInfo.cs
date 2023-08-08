@@ -7,7 +7,7 @@ namespace BlazorServerApp.Data.Objects
     public class PaginationInfo<T>
     {
         public List<T> Data { get; set; }
-        public int ItemPerPage { get; set; } = 1;
+        public int ItemPerPage { get; set; } = 10;
         public int CurrentPage { get; set; } = 1;
         public int TotalPages { get; set; }
         public int TotalCount { get; set; }
@@ -44,7 +44,7 @@ namespace BlazorServerApp.Data.Objects
 
             var totalCount = await dataSource.CountAsync();
             var listItem = await dataSource.Skip((currentPage - 1) * itemPerPage).Take(itemPerPage).ToListAsync();
-            var totalPages = (totalCount / itemPerPage) % 1 == 0 ? (int)(totalCount / itemPerPage) : (int)(totalCount / itemPerPage) + 1;
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / itemPerPage);
 
             var block = (int)Math.Ceiling((double)currentPage / pagePerBlock);
             var startPage = block * pagePerBlock - pagePerBlock + 1;
